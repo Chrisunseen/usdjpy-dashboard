@@ -63,15 +63,15 @@ def determine_trend():
 daily_trend, weekly_trend, monthly_trend = determine_trend()
 
 # Check and send alerts
-if float(us10y_yield) < us10y_alert:
+if us10y_yield != "N/A" and float(us10y_yield) < us10y_alert:
     message = f"ALERT: US10Y Yield dropped below {us10y_alert}%. Current: {us10y_yield}%"
     send_email_alert("US10Y Alert", message)
 
-if float(jp10y_yield) > jp10y_alert:
+if jp10y_yield != "N/A" and float(jp10y_yield) > jp10y_alert:
     message = f"ALERT: JP10Y Yield rose above {jp10y_alert}%. Current: {jp10y_yield}%"
     send_email_alert("JP10Y Alert", message)
 
-if float(vix_value) > vix_alert:
+if vix_value != "N/A" and float(vix_value) > vix_alert:
     message = f"ALERT: VIX Index is above {vix_alert}. Current: {vix_value}"
     send_email_alert("VIX Alert", message)
 

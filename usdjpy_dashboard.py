@@ -3,21 +3,33 @@ import pandas as pd
 import requests
 import smtplib
 
-# Function to fetch real-time data
+# Function to fetch real-time data with error handling
 def get_bond_yield(symbol):
     url = f"https://api.example.com/bond/{symbol}"  # Replace with actual API
-    response = requests.get(url)
-    return response.json().get("yield", "N/A")
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        return response.json().get("yield", "N/A")
+    except requests.exceptions.RequestException:
+        return "N/A"
 
 def get_nfp_data():
     url = "https://api.example.com/nfp"  # Replace with actual API
-    response = requests.get(url)
-    return response.json()
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException:
+        return {"jobs_added": "N/A", "unemployment_rate": "N/A"}
 
 def get_vix():
     url = "https://api.example.com/vix"  # Replace with actual API
-    response = requests.get(url)
-    return response.json().get("vix_value", "N/A")
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        return response.json().get("vix_value", "N/A")
+    except requests.exceptions.RequestException:
+        return "N/A"
 
 # Function to send email alert
 def send_email_alert(subject, message):

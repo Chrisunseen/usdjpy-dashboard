@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import requests
 import smtplib
-import pushbullet
 
 # Function to fetch real-time data
 def get_bond_yield(symbol):
@@ -31,11 +30,6 @@ def send_email_alert(subject, message):
         server.login(sender_email, password)
         server.sendmail(sender_email, receiver_email, f"Subject: {subject}\n\n{message}")
 
-# Function to send push notification
-def send_push_notification(title, message):
-    pb = pushbullet.Pushbullet("your_pushbullet_api_key")
-    push = pb.push_note(title, message)
-
 # Fetch Data
 us10y_yield = get_bond_yield("US10Y")
 jp10y_yield = get_bond_yield("JP10Y")
@@ -60,17 +54,14 @@ daily_trend, weekly_trend, monthly_trend = determine_trend()
 if float(us10y_yield) < us10y_alert:
     message = f"ALERT: US10Y Yield dropped below {us10y_alert}%. Current: {us10y_yield}%"
     send_email_alert("US10Y Alert", message)
-    send_push_notification("US10Y Alert", message)
 
 if float(jp10y_yield) > jp10y_alert:
     message = f"ALERT: JP10Y Yield rose above {jp10y_alert}%. Current: {jp10y_yield}%"
     send_email_alert("JP10Y Alert", message)
-    send_push_notification("JP10Y Alert", message)
 
 if float(vix_value) > vix_alert:
     message = f"ALERT: VIX Index is above {vix_alert}. Current: {vix_value}"
     send_email_alert("VIX Alert", message)
-    send_push_notification("VIX Alert", message)
 
 # Dashboard Layout
 st.title("USD/JPY Real-Time Data Dashboard")

@@ -55,9 +55,9 @@ vix_alert = 20
 
 # Determine Bullish or Bearish Trend
 def determine_trend():
-    daily_trend = "Bullish" if float(us10y_yield) > us10y_alert else "Bearish"
-    weekly_trend = "Bullish" if float(jp10y_yield) < jp10y_alert else "Bearish"
-    monthly_trend = "Bullish" if float(vix_value) < vix_alert else "Bearish"
+    daily_trend = "Bullish" if us10y_yield != "N/A" and float(us10y_yield) > us10y_alert else "Bearish"
+    weekly_trend = "Bullish" if jp10y_yield != "N/A" and float(jp10y_yield) < jp10y_alert else "Bearish"
+    monthly_trend = "Bullish" if vix_value != "N/A" and float(vix_value) < vix_alert else "Bearish"
     return daily_trend, weekly_trend, monthly_trend
 
 daily_trend, weekly_trend, monthly_trend = determine_trend()

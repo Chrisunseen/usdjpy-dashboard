@@ -79,17 +79,17 @@ if vix_value != "N/A" and float(vix_value) > vix_alert:
 st.title("USD/JPY Real-Time Data Dashboard")
 
 st.subheader("📉 U.S. 10-Year Treasury Yield")
-st.metric(label="US10Y Yield", value=f"{us10y_yield}%", delta=f"{'⚠️ Lower' if float(us10y_yield) < us10y_alert else 'Stable'}")
+st.metric(label="US10Y Yield", value=f"{us10y_yield if us10y_yield != 'N/A' else 'Data Unavailable'}%", delta=f"{'⚠️ Lower' if us10y_yield != 'N/A' and float(us10y_yield) < us10y_alert else 'Stable'}")
 
 st.subheader("📈 Japan 10-Year Government Bond Yield")
-st.metric(label="JP10Y Yield", value=f"{jp10y_yield}%", delta=f"{'🚀 Higher' if float(jp10y_yield) > jp10y_alert else 'Stable'}")
+st.metric(label="JP10Y Yield", value=f"{jp10y_yield if jp10y_yield != 'N/A' else 'Data Unavailable'}%", delta=f"{'🚀 Higher' if jp10y_yield != 'N/A' and float(jp10y_yield) > jp10y_alert else 'Stable'}")
 
 st.subheader("📊 U.S. Non-Farm Payrolls (NFP)")
 st.write(f"Employment Change: {nfp_data.get('jobs_added', 'N/A')} jobs")
 st.write(f"Unemployment Rate: {nfp_data.get('unemployment_rate', 'N/A')}%")
 
 st.subheader("⚠️ VIX (Volatility Index)")
-st.metric(label="VIX Index", value=vix_value, delta=f"{'🆘 High Fear' if float(vix_value) > vix_alert else 'Calm Markets'}")
+st.metric(label="VIX Index", value=f"{vix_value if vix_value != 'N/A' else 'Data Unavailable'}", delta=f"{'🆘 High Fear' if vix_value != 'N/A' and float(vix_value) > vix_alert else 'Calm Markets'}")
 
 st.subheader("📈 USD/JPY Trend Signals")
 st.write(f"**Daily Trend:** {daily_trend}")

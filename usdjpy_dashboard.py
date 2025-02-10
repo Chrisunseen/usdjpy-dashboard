@@ -3,31 +3,35 @@ import pandas as pd
 import requests
 import smtplib
 
-# Function to fetch real-time data with debugging
+# Function to fetch real-time data with actual API sources
 def get_bond_yield(symbol):
-    st.write(f"Fetching data for: {symbol}")  # Debugging message
-    url = f"https://api.example.com/bond/{symbol}"  # Replace with actual API
+    api_url = f"https://api.stlouisfed.org/fred/series?series_id=GS10&api_key=YOUR_API_KEY"
+    st.write(f"Fetching data for: {symbol}")  
     try:
-        response = requests.get(url, timeout=5)
+        response = requests.get(api_url, timeout=5)
         response.raise_for_status()
         data = response.json()
-        st.write(f"Response for {symbol}: {data}")  # Debugging output
-        return data.get("yield", "N/A")
+        return data.get("value", "N/A")
     except requests.exceptions.RequestException as e:
-        st.write(f"ERROR fetching {symbol}: {e}")  # Debugging error message
+        st.write(f"ERROR fetching {symbol}: {e}")
         return "N/A"
 
 def get_market_index(symbol):
-    st.write(f"Fetching data for: {symbol}")  # Debugging message
-    url = f"https://api.example.com/index/{symbol}"  # Replace with actual API
+    api_urls = {
+        "DXY": "https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=USD&to_symbol=JPY&apikey=YOUR_API_KEY",
+        "VIX": "https://query1.finance.yahoo.com/v8/finance/chart/^VIX",
+        "SPX": "https://query1.finance.yahoo.com/v8/finance/chart/^GSPC",
+        "Nikkei225": "https://query1.finance.yahoo.com/v8/finance/chart/^N225"
+    }
+    api_url = api_urls.get(symbol, "")
+    st.write(f"Fetching data for: {symbol}")
     try:
-        response = requests.get(url, timeout=5)
+        response = requests.get(api_url, timeout=5)
         response.raise_for_status()
         data = response.json()
-        st.write(f"Response for {symbol}: {data}")  # Debugging output
         return data.get("value", "N/A")
     except requests.exceptions.RequestException as e:
-        st.write(f"ERROR fetching {symbol}: {e}")  # Debugging error message
+        st.write(f"ERROR fetching {symbol}: {e}")
         return "N/A"
 
 # Fetch Data

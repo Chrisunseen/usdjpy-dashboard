@@ -5,6 +5,7 @@ import smtplib
 
 # Function to fetch real-time data with error handling
 def get_bond_yield(symbol):
+    st.write(f"Fetching data for: {symbol}")
     url = f"https://api.example.com/bond/{symbol}"  # Replace with actual API
     try:
         response = requests.get(url, timeout=5)
@@ -13,87 +14,43 @@ def get_bond_yield(symbol):
     except requests.exceptions.RequestException:
         return "N/A"
 
-def get_nfp_data():
-    url = "https://api.example.com/nfp"  # Replace with actual API
+def get_market_index(symbol):
+    st.write(f"Fetching data for: {symbol}")
+    url = f"https://api.example.com/index/{symbol}"  # Replace with actual API
     try:
         response = requests.get(url, timeout=5)
         response.raise_for_status()
-        return response.json()
-    except requests.exceptions.RequestException:
-        return {"jobs_added": "N/A", "unemployment_rate": "N/A"}
-
-def get_vix():
-    url = "https://api.example.com/vix"  # Replace with actual API
-    try:
-        response = requests.get(url, timeout=5)
-        response.raise_for_status()
-        return response.json().get("vix_value", "N/A")
+        return response.json().get("value", "N/A")
     except requests.exceptions.RequestException:
         return "N/A"
-
-# Function to send email alert
-def send_email_alert(subject, message):
-    sender_email = "your_email@example.com"
-    receiver_email = "recipient@example.com"
-    password = "your_email_password"
-    
-    with smtplib.SMTP("smtp.example.com", 587) as server:
-        server.starttls()
-        server.login(sender_email, password)
-        server.sendmail(sender_email, receiver_email, f"Subject: {subject}\n\n{message}")
 
 # Fetch Data
 us10y_yield = get_bond_yield("US10Y")
 jp10y_yield = get_bond_yield("JP10Y")
-nfp_data = get_nfp_data()
-vix_value = get_vix()
-
-# Set Alert Levels
-us10y_alert = 4.00  # Example threshold
-jp10y_alert = 1.00
-vix_alert = 20
-
-# Determine Bullish or Bearish Trend
-def determine_trend():
-    daily_trend = "Bullish" if us10y_yield != "N/A" and float(us10y_yield) > us10y_alert else "Bearish"
-    weekly_trend = "Bullish" if jp10y_yield != "N/A" and float(jp10y_yield) < jp10y_alert else "Bearish"
-    monthly_trend = "Bullish" if vix_value != "N/A" and float(vix_value) < vix_alert else "Bearish"
-    return daily_trend, weekly_trend, monthly_trend
-
-daily_trend, weekly_trend, monthly_trend = determine_trend()
-
-# Check and send alerts
-if us10y_yield != "N/A" and float(us10y_yield) < us10y_alert:
-    message = f"ALERT: US10Y Yield dropped below {us10y_alert}%. Current: {us10y_yield}%"
-    send_email_alert("US10Y Alert", message)
-
-if jp10y_yield != "N/A" and float(jp10y_yield) > jp10y_alert:
-    message = f"ALERT: JP10Y Yield rose above {jp10y_alert}%. Current: {jp10y_yield}%"
-    send_email_alert("JP10Y Alert", message)
-
-if vix_value != "N/A" and float(vix_value) > vix_alert:
-    message = f"ALERT: VIX Index is above {vix_alert}. Current: {vix_value}"
-    send_email_alert("VIX Alert", message)
+dxy_value = get_market_index("DXY")
+nikkei_value = get_market_index("Nikkei225")
+vix_value = get_market_index("VIX")
+spx_value = get_market_index("SPX")
 
 # Dashboard Layout
 st.title("USD/JPY Real-Time Data Dashboard")
 
 st.subheader("📉 U.S. 10-Year Treasury Yield")
-st.metric(label="US10Y Yield", value=f"{us10y_yield if us10y_yield != 'N/A' else 'Data Unavailable'}%", delta=f"{'⚠️ Lower' if us10y_yield != 'N/A' and float(us10y_yield) < us10y_alert else 'Stable'}")
+st.metric(label="US10Y Yield", value=f"{us10y_yield if us10y_yield != 'N/A' else 'Data Unavailable'}%", delta=f"{'⚠️ Lower' if us10y_yield != 'N/A' and float(us10y_yield) < 4.00 else 'Stable'}")
 
 st.subheader("📈 Japan 10-Year Government Bond Yield")
-st.metric(label="JP10Y Yield", value=f"{jp10y_yield if jp10y_yield != 'N/A' else 'Data Unavailable'}%", delta=f"{'🚀 Higher' if jp10y_yield != 'N/A' and float(jp10y_yield) > jp10y_alert else 'Stable'}")
+st.metric(label="JP10Y Yield", value=f"{jp10y_yield if jp10y_yield != 'N/A' else 'Data Unavailable'}%", delta=f"{'🚀 Higher' if jp10y_yield != 'N/A' and float(jp10y_yield) > 1.00 else 'Stable'}")
 
-st.subheader("📊 U.S. Non-Farm Payrolls (NFP)")
-st.write(f"Employment Change: {nfp_data.get('jobs_added', 'N/A')} jobs")
-st.write(f"Unemployment Rate: {nfp_data.get('unemployment_rate', 'N/A')}%")
+st.subheader("💲 U.S. Dollar Index (DXY)")
+st.metric(label="DXY Index", value=f"{dxy_value if dxy_value != 'N/A' else 'Data Unavailable'}", delta=f"{'📈 USD Strengthening' if dxy_value != 'N/A' and float(dxy_value) > 100 else '📉 USD Weakening'}")
+
+st.subheader("🏯 Nikkei 225 (Japan Stock Index)")
+st.metric(label="Nikkei 225", value=f"{nikkei_value if nikkei_value != 'N/A' else 'Data Unavailable'}", delta=f"{'📈 Risk-On (JPY Weakens)' if nikkei_value != 'N/A' and float(nikkei_value) > 28000 else '📉 Risk-Off (JPY Strengthens)'}")
 
 st.subheader("⚠️ VIX (Volatility Index)")
-st.metric(label="VIX Index", value=f"{vix_value if vix_value != 'N/A' else 'Data Unavailable'}", delta=f"{'🆘 High Fear' if vix_value != 'N/A' and float(vix_value) > vix_alert else 'Calm Markets'}")
+st.metric(label="VIX Index", value=f"{vix_value if vix_value != 'N/A' else 'Data Unavailable'}", delta=f"{'🆘 High Fear (JPY Strengthens)' if vix_value != 'N/A' and float(vix_value) > 20 else 'Calm Markets (JPY Weakens)'}")
 
-st.subheader("📈 USD/JPY Trend Signals")
-st.write(f"**Daily Trend:** {daily_trend}")
-st.write(f"**Weekly Trend:** {weekly_trend}")
-st.write(f"**Monthly Trend:** {monthly_trend}")
+st.subheader("📊 S&P 500 Index (SPX)")
+st.metric(label="S&P 500", value=f"{spx_value if spx_value != 'N/A' else 'Data Unavailable'}", delta=f"{'📈 Risk-On (JPY Weakens)' if spx_value != 'N/A' and float(spx_value) > 4000 else '📉 Risk-Off (JPY Strengthens)'}")
 
 st.write("*Data updated in real-time*")

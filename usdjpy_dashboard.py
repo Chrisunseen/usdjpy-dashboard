@@ -3,25 +3,31 @@ import pandas as pd
 import requests
 import smtplib
 
-# Function to fetch real-time data with error handling
+# Function to fetch real-time data with debugging
 def get_bond_yield(symbol):
-    st.write(f"Fetching data for: {symbol}")
+    st.write(f"Fetching data for: {symbol}")  # Debugging message
     url = f"https://api.example.com/bond/{symbol}"  # Replace with actual API
     try:
         response = requests.get(url, timeout=5)
         response.raise_for_status()
-        return response.json().get("yield", "N/A")
-    except requests.exceptions.RequestException:
+        data = response.json()
+        st.write(f"Response for {symbol}: {data}")  # Debugging output
+        return data.get("yield", "N/A")
+    except requests.exceptions.RequestException as e:
+        st.write(f"ERROR fetching {symbol}: {e}")  # Debugging error message
         return "N/A"
 
 def get_market_index(symbol):
-    st.write(f"Fetching data for: {symbol}")
+    st.write(f"Fetching data for: {symbol}")  # Debugging message
     url = f"https://api.example.com/index/{symbol}"  # Replace with actual API
     try:
         response = requests.get(url, timeout=5)
         response.raise_for_status()
-        return response.json().get("value", "N/A")
-    except requests.exceptions.RequestException:
+        data = response.json()
+        st.write(f"Response for {symbol}: {data}")  # Debugging output
+        return data.get("value", "N/A")
+    except requests.exceptions.RequestException as e:
+        st.write(f"ERROR fetching {symbol}: {e}")  # Debugging error message
         return "N/A"
 
 # Fetch Data
